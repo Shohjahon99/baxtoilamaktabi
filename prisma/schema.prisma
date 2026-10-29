@@ -1,0 +1,205 @@
+// Baxt oila online maktabi — ma'lumotlar bazasi sxemasi.
+// Dev: SQLite. Prod: provider = "postgresql" ga almashtiriladi (sxema mos).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  telegramId String?  @unique
+  username   String?
+  phone      String?
+  firstName  String
+  lastName   String?
+  // Sertifikatga yoziladigan to'liq F.I.Sh. (foydalanuvchi o'zi kiritadi)
+  fullName   String?
+  birthYear  Int?
+  region     String?
+  role       String   @default("STUDENT") // STUDENT | ADMIN
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  enrollments  Enrollment[]
+  progress     LessonProgress[]
+  examAttempts ExamAttempt[]
+  payments     Payment[]
+  certificates Certificate[]
+  loginTokens  LoginToken[]
+  feedbacks    Feedback[]
+}
+
+// Telegram orqali kirish: sayt kod yaratadi -> bot kodni tasdiqlaydi -> sayt sessiya ochadi
+model LoginToken {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  status    String   @default("PENDING") // PENDING | CONFIRMED | USED
+  chatId    String? // kodni botda ochgan Telegram chat
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Course {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  audience     String // kimlar uchun
+  shortDesc    String
+  description  String
+  emoji        String   @default("📘")
+  image        String? // muqova rasmi URL
+  color        String   @default("rose") // kartochka rangi
+  price        Int      @default(0) // so'mda; 0 = bepul
+  status       String   @default("DRAFT") // DRAFT | PUBLISHED
+  order        Int      @default(0)
+  // yakuniy imtihondan o'tish uchun minimal band (0–9)
+  passingBand  Float    @default(5)
+  examSize     Int      @default(20) // imtihonda nechta savol beriladi
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  modules       Module[]
+  examQuestions Question[]    @relation("ExamQuestions")
+  enrollments   Enrollment[]
+  examAttempts  ExamAttempt[]
+  payments      Payment[]
+  certificates  Certificate[]
+  feedbacks     Feedback[]
+}
+
+model Module {
+  id       String   @id @default(cuid())
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title    String
+  order    Int      @default(0)
+  lessons  Lesson[]
+}
+
+model Lesson {
+  id        String   @id @default(cuid())
+  moduleId  String
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title     String
+  content   String // markdown
+  videoUrl  String?
+  minutes   Int      @default(10)
+  order     Int      @default(0)
+  // ochiq dars: kursga yozilmaganlar ham ko'ra oladi
+  isPreview Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+
+  questions Question[]
+  progress  LessonProgress[]
+}
+
+// Savol dars testiga (lessonId) yoki kurs yakuniy imtihoniga (examCourseId) tegishli
+model Question {
+  id           String  @id @default(cuid())
+  lessonId     String?
+  lesson       Lesson? @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  examCourseId String?
+  examCourse   Course? @relation("ExamQuestions", fields: [examCourseId], references: [id], onDelete: Cascade)
+  text         String
+  options      String // JSON: string[]
+  correct      Int // to'g'ri javob indeksi
+  explanation  String?
+  order        Int     @default(0)
+}
+
+model Enrollment {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  status      String    @default("ACTIVE") // ACTIVE | COMPLETED
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@unique([userId, courseId])
+}
+
+model LessonProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  quizScore   Int? // foizda
+  completedAt DateTime @default(now())
+
+  @@unique([userId, lessonId])
+}
+
+model ExamAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  // berilgan savollar va javoblar: JSON [{questionId, answer}]
+  answers   String   @default("[]")
+  correct   Int      @default(0)
+  total     Int      @default(0)
+  band      Float?
+  passed    Boolean  @default(false)
+  startedAt DateTime @default(now())
+  finishedAt DateTime?
+}
+
+model Payment {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  amount      Int
+  provider    String    @default("CLICK")
+  status      String    @default("PENDING") // PENDING | PREPARED | PAID | CANCELLED
+  clickTransId String?
+  createdAt   DateTime  @default(now())
+  paidAt      DateTime?
+}
+
+model Certificate {
+  id       String   @id @default(cuid())
+  number   String   @unique // BO-2026-000001
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  fullName String // berilgan paytdagi F.I.Sh.
+  band     Float
+  percent  Int
+  issuedAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
+
+// Kursni tamomlagandan keyingi baho (1–5) va izoh
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, courseId])
+}
+
+model Setting {
+  key   String @id
+  value String
+}
