@@ -16,7 +16,7 @@ export default async function CertificatesPage({ searchParams }: PageProps<"/adm
   const [certs, courses] = await Promise.all([
     db.certificate.findMany({
       where: {
-        ...(term ? { OR: [{ number: { contains: term.toUpperCase() } }, { fullName: { contains: term } }] } : {}),
+        ...(term ? { OR: [{ number: { contains: term.toUpperCase() } }, { fullName: { contains: term, mode: "insensitive" } }] } : {}),
         ...(courseId ? { courseId } : {}),
       },
       orderBy: { issuedAt: "desc" },

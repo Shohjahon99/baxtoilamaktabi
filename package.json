@@ -9,10 +9,12 @@
     "lint": "eslint",
     "bot:dev": "tsx --env-file=.env scripts/bot-dev.ts",
     "db:seed": "prisma db seed",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "vercel-build": "prisma generate && prisma migrate deploy && prisma db seed && next build"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "@vercel/blob": "^2.8.2",
     "jose": "^6.2.14",
     "motion": "^14.7.1",
     "next": "16.4.3",

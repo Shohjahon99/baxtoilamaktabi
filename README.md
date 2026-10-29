@@ -2,7 +2,7 @@
 
 To'liq avtomatik onlayn oila maktabi: Telegram orqali kirish, bepul va pullik (Click) kurslar, dars testlari, yakuniy imtihon va 9 ballik QR-kodli sertifikat.
 
-**Stek:** Next.js 16 (App Router, server actions) · Prisma 6 · SQLite (dev) / PostgreSQL (prod) · Tailwind 4
+**Stek:** Next.js 16 (App Router, server actions) · Prisma 6 · PostgreSQL (Neon) · Tailwind 4
 
 ## Ishga tushirish (lokal)
 
@@ -55,6 +55,11 @@ Yuklangan rasmlar `uploads/` papkasida (gitignore'da) — serverda zaxira nusxas
 - **Kurs rasmlari:** `Course.image` (hozir Unsplash, bepul litsenziya). O'z rasmlaringizni `public/` ga qo'yib, URL ni almashtirish mumkin.
 - **«Oila nega muhim» statistikasi:** `lib/family-stats.ts` — har bir raqam manbasi bilan. Yangi rasmiy ma'lumot chiqqanda shu faylni yangilang.
 
-## Prod'ga o'tkazish
+## Vercel'ga deploy (Neon Postgres + Blob)
 
-`prisma/schema.prisma` da `provider = "postgresql"` qiling, `DATABASE_URL` ni Postgres'ga yo'naltiring, `DEV_LOGIN=0`, so'ng `npx prisma migrate deploy && npm run build`.
+1. Vercel → loyiha → **Storage → Create → Neon (Postgres)** → loyihaga ulang (prefiks standart: `DATABASE_URL`, `DATABASE_URL_UNPOOLED`).
+2. **Storage → Create → Blob** → loyihaga ulang (`BLOB_READ_WRITE_TOKEN` qo'shiladi) — admin rasm yuklashi uchun.
+3. **Settings → Environment Variables**: `SESSION_SECRET` (32+ belgi), `ADMIN_LOGIN`, `ADMIN_PASSWORD`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`, `TELEGRAM_WEBHOOK_SECRET`. `APP_URL` ixtiyoriy (bo'lmasa Vercel domeni).
+4. Redeploy. `vercel-build` skripti o'zi: `prisma migrate deploy` → `prisma db seed` (kurslar) → `next build`.
+
+Lokal ishlash uchun `.env` ga Neon'dagi ulanish satrlarini qo'ying (Vercel → Storage → Neon → `.env.local` bo'limi).

@@ -9,6 +9,9 @@ import { DIVORCES, DIVORCES_2024, DIVORCES_PER_DAY, DIVORCE_RATIO, GROWTH_2020_2
 import { priceLabel } from "@/lib/format";
 
 // Taqdimot faqat /taqdimot manzili orqali ochiladi: saytda havolasi yo'q, qidiruv tizimlari indekslamaydi
+// statistika bazadan har safar yangidan olinadi (build paytida baza bo'lmasligi mumkin)
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Taqdimot",
   robots: { index: false, follow: false },

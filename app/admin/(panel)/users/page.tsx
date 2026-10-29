@@ -13,7 +13,14 @@ export default async function UsersPage({ searchParams }: PageProps<"/admin/user
 
   const where = {
     ...(term
-      ? { OR: [{ fullName: { contains: term } }, { firstName: { contains: term } }, { phone: { contains: term } }, { username: { contains: term } }] }
+      ? {
+          OR: [
+            { fullName: { contains: term, mode: "insensitive" as const } },
+            { firstName: { contains: term, mode: "insensitive" as const } },
+            { phone: { contains: term } },
+            { username: { contains: term, mode: "insensitive" as const } },
+          ],
+        }
       : {}),
     ...(reg ? { region: reg } : {}),
   };

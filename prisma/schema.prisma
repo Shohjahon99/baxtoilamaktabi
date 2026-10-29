@@ -1,13 +1,15 @@
-// Baxt oila online maktabi — ma'lumotlar bazasi sxemasi.
-// Dev: SQLite. Prod: provider = "postgresql" ga almashtiriladi (sxema mos).
+// Baxt oila online maktabi — ma'lumotlar bazasi sxemasi (PostgreSQL, Vercel'da Neon).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  // Neon: DATABASE_URL — pooled ulanish (ilova uchun),
+  // DATABASE_URL_UNPOOLED — to'g'ridan-to'g'ri ulanish (migratsiyalar uchun)
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 model User {
