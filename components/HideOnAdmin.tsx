@@ -3,7 +3,10 @@
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-// Admin panelning o'z layout'i bor — platforma header/footer'i u yerda chiqmaydi
+// Admin panel va taqdimotning o'z ko'rinishi bor — platforma header/footer'i u yerda chiqmaydi
+const OWN_LAYOUT = ["/admin", "/taqdimot"];
+
 export function HideOnAdmin({ children }: { children: ReactNode }) {
-  return usePathname().startsWith("/admin") ? null : children;
+  const path = usePathname();
+  return OWN_LAYOUT.some((p) => path.startsWith(p)) ? null : children;
 }

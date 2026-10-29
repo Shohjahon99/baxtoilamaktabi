@@ -119,6 +119,19 @@ export function GrowBar({ percent, delay = 0, className = "" }: { percent: numbe
   );
 }
 
+// Ko'rinishga kirganda eniga o'sadigan chiziq (gorizontal diagramma uchun)
+export function GrowWidth({ percent, delay = 0, className = "" }: { percent: number; delay?: number; className?: string }) {
+  return (
+    <motion.div
+      className={className}
+      initial={{ width: 0 }}
+      whileInView={{ width: `${percent}%` }}
+      viewport={{ once: true }}
+      transition={{ duration: 1.2, delay, ease }}
+    />
+  );
+}
+
 // Kartochka: sichqoncha bilan biroz qiyshayadi (3D tilt)
 export function Tilt({ children, className = "" }: { children: ReactNode; className?: string }) {
   const rx = useMotionValue(0);

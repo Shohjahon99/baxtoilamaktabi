@@ -575,6 +575,25 @@ Ko'plab yosh oilalar hayotini **katta qarz bilan** boshlaydi: to'y uchun olingan
 
 > Hasham to'y baxtli oila kafolati emas. Ixcham, qarzsiz to'y esa yosh oilaga mustahkam start beradi.
 
+Payg'ambarimiz (s.a.v.) ham: **«Eng barakali nikoh — xarajati eng oz bo'lganidir»**, deganlar (Imom Ahmad rivoyati). Oila olimlarining kuzatuvlari ham shuni tasdiqlaydi: yosh oilalarni ko'pincha sevgining yo'qligi emas, **tashqi stress** — qarz va moliyaviy qiyinchilik buzadi.
+
+### Davlat nima deydi?
+
+2019-yil 14-sentabrda Oliy Majlis palatalari kengashlarining qo'shma qarori bilan **to'y va oilaviy tantanalarni o'tkazish tartibi** tasdiqlangan (2020-yil 1-yanvardan amalda):
+
+- to'yga **200 kishigacha** (oshga 250 kishigacha) mehmon;
+- tadbir **bir kunda, 06:00 dan 23:00 gacha**;
+- to'y kortejida **3 tadan ortiq** avtomobil emas, **2 ta xonanda** yoki bitta guruh;
+- «kelin navkari», «sep yoydi», «pul sochish» kabi ortiqcha marosimlar, dabdaba va isrofgarchilik taqiqlangan.
+
+2025-yilda bu sohani yanada tartibga solish va yoshlarda **tejamkorlik madaniyatini** shakllantirish bo'yicha yangi choralar belgilandi. Lekin hech qanday qaror sizning o'rningizga qaror qabul qilmaydi: ixcham to'y — bu avvalo **kuyov va kelinning, ularning ota-onalarining ongli tanlovi**.
+
+### O'zingizga savol bering
+
+- To'y uchun qarz olsak, uni necha oyda to'laymiz? Shu oylar oilamizga qanday ta'sir qiladi?
+- Tejangan pul bilan nima qilish mumkin: uy-joy uchun boshlang'ich to'lov, kasb o'rganish, kichik biznes?
+- To'y hajmi haqida ota-onalar bilan **to'ydan ancha oldin**, xotirjam gaplasha olamizmi?
+
 ## Oila byudjetini tuzish
 
 Oila byudjeti — bu daromad va xarajatlarni oldindan rejalashtirish. Oddiy usullardan biri — **50/30/20 qoidasi**:
