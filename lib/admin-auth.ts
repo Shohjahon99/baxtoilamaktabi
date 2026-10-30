@@ -12,7 +12,7 @@ import { sessionSecret } from "./session";
 
 const COOKIE = "bo_admin";
 const MAX_AGE = 60 * 60 * 12; // 12 soat
-const key = () => new TextEncoder().encode(`${sessionSecret()}:admin`);
+const key = async () => new TextEncoder().encode(`${await sessionSecret()}:admin`);
 
 function hash(password: string, salt = randomBytes(16).toString("hex")) {
   return `${salt}:${scryptSync(password, salt, 64).toString("hex")}`;
@@ -66,7 +66,7 @@ export async function createAdminSession() {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${MAX_AGE}s`)
-    .sign(key());
+    .sign(await key());
   (await cookies()).set(COOKIE, token, {
     httpOnly: true,
     sameSite: "strict",
@@ -80,7 +80,7 @@ export async function isAdmin() {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return false;
   try {
-    const { payload } = await jwtVerify(token, key());
+    const { payload } = await jwtVerify(token, await key());
     return payload.adm === true && payload.pv === (await passwordVersion());
   } catch {
     return false;

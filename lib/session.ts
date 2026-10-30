@@ -1,24 +1,38 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { randomBytes } from "crypto";
 import { SignJWT, jwtVerify } from "jose";
+import { db } from "./db";
 
 const COOKIE = "bo_session";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 kun
 
-// Kalit bo'lmasa sessiyani soxtalashtirish mumkin bo'lib qoladi — shuning uchun ishlamay to'xtaymiz
-export function sessionSecret() {
-  const s = process.env.SESSION_SECRET ?? "";
-  if (s.length < 32) throw new Error("SESSION_SECRET o'rnatilmagan yoki juda qisqa (kamida 32 belgi)");
-  return s;
+// Sessiya kaliti: .env dagi SESSION_SECRET (kamida 32 belgi), bo'lmasa birinchi so'rovda
+// tasodifiy kalit yaratilib bazada saqlanadi — Vercel'da qo'lda kiritish shart emas.
+let cached: string | null = null;
+
+export async function sessionSecret() {
+  if (cached) return cached;
+  const env = process.env.SESSION_SECRET ?? "";
+  if (env.length >= 32) return (cached = env);
+  const create = () =>
+    db.setting.upsert({
+      where: { key: "session_secret" },
+      create: { key: "session_secret", value: randomBytes(32).toString("hex") },
+      update: {},
+    });
+  // ikki so'rov bir vaqtda yaratmoqchi bo'lsa, ikkinchisi mavjudini o'qiydi
+  const row = await create().catch(create);
+  return (cached = row.value);
 }
-const key = () => new TextEncoder().encode(sessionSecret());
+const key = async () => new TextEncoder().encode(await sessionSecret());
 
 export async function createSession(userId: string) {
   const token = await new SignJWT({ uid: userId })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${MAX_AGE}s`)
-    .sign(key());
+    .sign(await key());
   (await cookies()).set(COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
@@ -32,7 +46,7 @@ export async function getSessionUserId(): Promise<string | null> {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, key());
+    const { payload } = await jwtVerify(token, await key());
     return typeof payload.uid === "string" ? payload.uid : null;
   } catch {
     return null;
