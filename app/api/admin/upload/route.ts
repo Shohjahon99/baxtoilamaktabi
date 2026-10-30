@@ -19,7 +19,8 @@ export async function POST(request: Request) {
 
   const name = `${Date.now()}-${randomBytes(6).toString("hex")}.${ext}`;
 
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  // Blob ulangan: eski usulda token, yangi usulda BLOB_STORE_ID (Vercel OIDC orqali)
+  if (process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID) {
     const blob = await put(`courses/${name}`, file, { access: "public", contentType: file.type });
     return Response.json({ url: blob.url });
   }
